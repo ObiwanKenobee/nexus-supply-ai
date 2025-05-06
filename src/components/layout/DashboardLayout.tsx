@@ -1,8 +1,9 @@
 
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Bell, Settings, Search } from "lucide-react";
+import { Menu, X, Bell, Settings, Search, Package, FileSearch, Users, RefreshCw, BarChart3 } from "lucide-react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,17 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const navItems = [
+    { label: "Dashboard", path: "/dashboard", icon: <span className="w-5 h-5 flex items-center justify-center">D</span> },
+    { label: "Shipments", path: "/shipments", icon: <Package className="h-5 w-5" /> },
+    { label: "QA Engine", path: "/qa-engine", icon: <FileSearch className="h-5 w-5" /> },
+    { label: "Suppliers", path: "/suppliers", icon: <Users className="h-5 w-5" /> },
+    { label: "Rework", path: "/rework", icon: <RefreshCw className="h-5 w-5" /> },
+    { label: "ESG Analytics", path: "/esg-analytics", icon: <BarChart3 className="h-5 w-5" /> }
+  ];
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -38,12 +50,16 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         </div>
         <nav className="p-4">
           <div className="space-y-1">
-            <NavItem label="Dashboard" active />
-            <NavItem label="Shipments" />
-            <NavItem label="QA Engine" />
-            <NavItem label="Suppliers" />
-            <NavItem label="Rework" />
-            <NavItem label="ESG Analytics" />
+            {navItems.map((item) => (
+              <NavItem 
+                key={item.path}
+                label={item.label} 
+                path={item.path}
+                icon={item.icon}
+                active={location.pathname === item.path}
+                onClick={() => navigate(item.path)}
+              />
+            ))}
           </div>
         </nav>
       </aside>
@@ -93,18 +109,31 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 };
 
 // Helper component for sidebar navigation items
-const NavItem = ({ label, active = false }: { label: string; active?: boolean }) => (
-  <a
-    href="#"
+const NavItem = ({ 
+  label, 
+  active = false, 
+  path,
+  icon,
+  onClick
+}: { 
+  label: string; 
+  active?: boolean;
+  path: string;
+  icon?: React.ReactNode;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
     className={cn(
-      "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
+      "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
       active
         ? "bg-slate-700 text-white"
         : "text-slate-300 hover:text-white hover:bg-slate-800"
     )}
   >
+    {icon && <span className="mr-3">{icon}</span>}
     {label}
-  </a>
+  </button>
 );
 
 export default DashboardLayout;
